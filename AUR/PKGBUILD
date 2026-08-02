@@ -1,0 +1,33 @@
+# Maintainer: StarWhiteIsBusy <StarWhiteIsBusy@users.noreply.github.com>
+#
+# === 上传前必改 (Before uploading, update these) ===
+# 1. url / source: 改成你的 GitHub 仓库地址 (point to your actual GitHub repo)
+# 2. source 里的 tag: 先在 GitHub 发布 v1.0.0 tag,再上传 AUR
+# 3. sha256sums: 替换 SKIP 为真实哈希 (replace SKIP with the real hash,
+#    例如: curl -sL <source-url> | sha256sum)
+# 4. Maintainer 邮箱换成你自己的 (use your own email)
+# 5. 改完后重新生成 .SRCINFO: makepkg --printsrcinfo > .SRCINFO
+# 6. 本地验证: makepkg -si
+# 7. 上传: web https://aur.archlinux.org/submit 上传
+#    PKGBUILD + .SRCINFO 的 tar 包;或 git:
+#    git clone ssh://aur@aur.archlinux.org/niri-open-terminal-here.git
+# =====================================================
+
+pkgname=niri-open-terminal-here
+pkgver=1.0.0
+pkgrel=2
+pkgdesc="Context-aware terminal launcher for niri: Super+Enter opens kitty in the current Nautilus folder, otherwise in \$HOME"
+arch=('any')
+url="https://github.com/StarWhiteIsBusy/fast-path"
+license=('MIT')
+depends=('kitty' 'jq' 'niri')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/StarWhiteIsBusy/fast-path/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  cd "$srcdir/fast-path-$pkgver"
+  install -Dm755 open-terminal-here.sh "$pkgdir/usr/bin/open-terminal-here"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+  install -Dm644 config/niri-snippet.kdl "$pkgdir/usr/share/doc/$pkgname/niri-snippet.kdl"
+}
