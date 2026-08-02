@@ -138,6 +138,19 @@ Nautilus 过去正是通过 `org.gnome.Nautilus.Window.GetCurrentLocation` 提�
 
 ## Files · 文件
 
+```
+fast-path/
+├── install.sh                 # 自包含安装/卸载脚本 · self-contained installer
+├── open-terminal-here.sh      # 核心脚本 · core script (Super+Enter 执行)
+├── README.md                  # 文档 · documentation
+├── LICENSE                    # MIT 许可证
+├── config/
+│   └── niri-snippet.kdl       # niri 绑定片段 · binding snippet
+└── aur/
+    ├── PKGBUILD               # AUR 打包脚本
+    └── .SRCINFO               # AUR 源信息
+```
+
 | File · 文件 | Purpose · 作用 |
 |---|---|
 | `open-terminal-here.sh` | Core script: resolves the focused Nautilus folder and launches kitty there — the program executed by **Super + Enter** · 核心脚本:解析焦点 Nautilus 的浏览目录并在其中启动 kitty——**Super+Enter** 实际执行的程序 |
