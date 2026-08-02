@@ -1,0 +1,7 @@
+// niri keybinding snippet — add to ~/.config/niri/config.kdl
+// niri 键位绑定片段 — 添加到 ~/.config/niri/config.kdl
+//
+// Replace the existing terminal binding (e.g. `Mod+Return { spawn "kitty"; }`)
+// 替换原有的终端绑定(例如 `Mod+Return { spawn "kitty"; }`)
+
+Mod+Return  { spawn-sh "open-terminal-here"; }
