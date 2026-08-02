@@ -40,6 +40,16 @@ A context-aware terminal launcher for the **niri** Wayland compositor.
 ./install.sh
 ```
 
+Or install directly from GitHub · 或直接从 GitHub 安装:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/StarWhiteIsBusy/Fast-Path/refs/heads/main/install.sh \
+  -o /tmp/fast-path-install.sh && bash /tmp/fast-path-install.sh
+```
+
+> Do **not** use `curl ... | bash` — the single-file installer extracts its embedded core script from the file path, which is unavailable on a pipe. The script prints this hint if you try.
+> **不要**用 `curl ... | bash` 管道——单文件安装脚本需要从真实文件路径提取内嵌的核心脚本,管道下无法读取。若误用,脚本会给出提示。
+
 - **Self-contained**: `install.sh` is a single file — the core script is embedded inside it, so you can copy just this one file to a new machine and run it (no other files needed; only bash + coreutils are required to run the installer itself)
 - **自包含**:`install.sh` 是单文件——核心脚本内嵌在其中,新电脑上只需拷这一个文件即可使用(运行安装脚本本身只需要 bash + coreutils)
 - If `open-terminal-here.sh` sits next to `install.sh`, that copy is preferred (so the repo copy stays canonical); otherwise the embedded content is extracted
