@@ -7,7 +7,8 @@
 #   脚本 -> /usr/bin/open-terminal-here
 #   绑定 -> Mod+Return  { spawn-sh "open-terminal-here"; }
 # 需要 sudo 权限;脚本会先请求一次密码(sudo -v),随后静默执行。
-# 本脚本自包含:核心脚本内嵌在文件底部标记区;若与 open-terminal-here.sh
+# 本脚本自包含:核心脚本以 heredoc 形式内嵌在 extract_embedded() 中,不依赖
+# 真实文件路径,支持 curl | bash 管道直接运行;若与 open-terminal-here.sh
 # 同目录,则优先复制同目录文件(便于同步维护)。
 
 set -u
@@ -35,10 +36,14 @@ C_OK=$'\033[1;32m'
 C_WARN=$'\033[1;33m'
 C_ERR=$'\033[1;31m'
 
-SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
+  SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+  SRC_DIR=""
+fi
 SOURCE="$SRC_DIR/open-terminal-here.sh"
 HAS_ALONGSIDE=0
-[ -f "$SOURCE" ] && HAS_ALONGSIDE=1
+[ -n "$SRC_DIR" ] && [ -f "$SOURCE" ] && HAS_ALONGSIDE=1
 
 # ---------- 权限 ----------
 sudocmd() {
@@ -117,10 +122,62 @@ check_deps() {
 }
 
 # ---------- 提取内嵌的核心脚本 ----------
+# 核心脚本以 heredoc 形式内嵌,不依赖 $0 真实文件路径,可通过 curl | bash 直接运行
 extract_embedded() {
-  awk '/^# >>>>> open-terminal-here.sh >>>>>>/{f=1;next}
-       /^# <<<<< open-terminal-here.sh <<<<</{f=0}
-       f' "$0" > "$1"
+  cat > "$1" <<'FAST_PATH_SCRIPT_EOF'
+#!/usr/bin/env bash
+set -o pipefail
+
+TARGET="$HOME"
+
+get_focused() {
+  niri msg --json focused-window 2>/dev/null
+}
+
+find_nautilus_dir() {
+  local pid="$1" title="$2"
+  local fd target base
+
+  for fd in /proc/"$pid"/fd/*; do
+    target=$(readlink "$fd" 2>/dev/null) || continue
+    case "$target" in
+      */.last_cwd|/dev/*|/proc/*|/sys/*|*.so*|/usr/lib*|/memfd:*|pipe:*|socket:*)
+        continue
+        ;;
+    esac
+    if [ -d "$target" ]; then
+      base=${target##*/}
+      if [ "$base" = "$title" ]; then
+        echo "$target"
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
+focused=$(get_focused)
+
+if [ -n "$focused" ]; then
+  app_id=$(printf '%s' "$focused" | jq -r '.app_id // empty')
+  if [ "$app_id" = "org.gnome.Nautilus" ]; then
+    pid=$(printf '%s' "$focused" | jq -r '.pid // empty')
+    title=$(printf '%s' "$focused" | jq -r '.title // empty')
+    if [ -n "$pid" ] && [ -n "$title" ]; then
+      if [ "$title" = "主文件夹" ]; then
+        TARGET="$HOME"
+      else
+        dir=$(find_nautilus_dir "$pid" "$title")
+        if [ -n "$dir" ]; then
+          TARGET="$dir"
+        fi
+      fi
+    fi
+  fi
+fi
+
+exec kitty --directory "$TARGET"
+FAST_PATH_SCRIPT_EOF
   chmod +x "$1"
 }
 
@@ -313,58 +370,3 @@ else
 fi
 
 exit 0
-
-# >>>>> open-terminal-here.sh >>>>>>
-#!/usr/bin/env bash
-set -o pipefail
-
-TARGET="$HOME"
-
-get_focused() {
-  niri msg --json focused-window 2>/dev/null
-}
-
-find_nautilus_dir() {
-  local pid="$1" title="$2"
-  local fd target base
-
-  for fd in /proc/"$pid"/fd/*; do
-    target=$(readlink "$fd" 2>/dev/null) || continue
-    case "$target" in
-      */.last_cwd|/dev/*|/proc/*|/sys/*|*.so*|/usr/lib*|/memfd:*|pipe:*|socket:*)
-        continue
-        ;;
-    esac
-    if [ -d "$target" ]; then
-      base=${target##*/}
-      if [ "$base" = "$title" ]; then
-        echo "$target"
-        return 0
-      fi
-    fi
-  done
-  return 1
-}
-
-focused=$(get_focused)
-
-if [ -n "$focused" ]; then
-  app_id=$(printf '%s' "$focused" | jq -r '.app_id // empty')
-  if [ "$app_id" = "org.gnome.Nautilus" ]; then
-    pid=$(printf '%s' "$focused" | jq -r '.pid // empty')
-    title=$(printf '%s' "$focused" | jq -r '.title // empty')
-    if [ -n "$pid" ] && [ -n "$title" ]; then
-      if [ "$title" = "主文件夹" ]; then
-        TARGET="$HOME"
-      else
-        dir=$(find_nautilus_dir "$pid" "$title")
-        if [ -n "$dir" ]; then
-          TARGET="$dir"
-        fi
-      fi
-    fi
-  fi
-fi
-
-exec kitty --directory "$TARGET"
-# <<<<< open-terminal-here.sh <<<<<
