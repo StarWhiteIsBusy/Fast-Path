@@ -1,4 +1,4 @@
-# Open Terminal Here · 在此处打开终端
+# Fast-Path · 快速路径
 
 A context-aware terminal launcher for the **niri** Wayland compositor.
 
