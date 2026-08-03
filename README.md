@@ -34,16 +34,18 @@ A context-aware terminal launcher for the **niri** Wayland compositor.
 
 ## Installation · 安装
 
-### One-command install · 一键安装 (recommended · 推荐)
-
-```bash
-./install.sh
-```
-
-Or install directly from GitHub · 或直接从 GitHub 安装:
+### install directly from GitHub ·直接从 Curl 安装 (recommended · 推荐):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/StarWhiteIsBusy/Fast-Path/refs/heads/main/install.sh | bash
+```
+
+
+or One-command install · 下载bash文件后一键安装 :
+
+（到达目录下 Arrive to the path）
+```bash
+./install.sh
 ```
 
 All files are embedded in the single-file installer (heredoc), so piping works — no file path or extra files needed. Running the **same command again** performs a clean uninstall.
