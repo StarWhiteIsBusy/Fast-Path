@@ -46,9 +46,9 @@ Or install directly from GitHub · 或直接从 GitHub 安装:
 curl -fsSL https://raw.githubusercontent.com/StarWhiteIsBusy/Fast-Path/refs/heads/main/install.sh | bash
 ```
 
-All files are embedded in the single-file installer (heredoc), so piping works — no file path or extra files needed.
+All files are embedded in the single-file installer (heredoc), so piping works — no file path or extra files needed. Running the **same command again** performs a clean uninstall.
 
-所有文件均内嵌在单文件安装脚本中(heredoc 形式),管道直接运行即可,无需真实文件路径或额外文件。
+所有文件均内嵌在单文件安装脚本中(heredoc 形式),管道直接运行即可,无需真实文件路径或额外文件。**再次运行同一条命令即为干净的卸载**。
 
 - **Self-contained**: `install.sh` is a single file — the core script is embedded inside it, so you can copy just this one file to a new machine and run it (no other files needed; only bash + coreutils are required to run the installer itself)
 - **自包含**:`install.sh` 是单文件——核心脚本内嵌在其中,新电脑上只需拷这一个文件即可使用(运行安装脚本本身只需要 bash + coreutils)
@@ -100,7 +100,7 @@ That's it. Press **Super + Enter** to try it out.
 
 Running `install.sh` again when the plugin is already installed turns it into an uninstaller — same progress bar style, same file names, ending with **✔ 卸载完成** and the same 3-second countdown:
 
-已安装时再次运行 `install.sh` 会变成卸载脚本——同样式进度条、同样的文件名显示,结束显示 **✔ 卸载完成**,同样 3 秒倒计时:
+已安装时再次运行 `install.sh`(或上面同一条 GitHub curl 命令)会变成卸载脚本——同样式进度条、同样的文件名显示,结束显示 **✔ 卸载完成**,同样 3 秒倒计时:
 
 - Restores the niri config: if the stock kitty binding was replaced, it is restored; if the binding was inserted, only that line is removed (based on the recorded install marker; falls back to restoring the kitty binding when no marker exists). Bindings from older versions (the `~/fast-path/...` form) are restored too
 - 还原 niri 配置:替换过 kitty 绑定则原样还原;纯插入则只删除绑定行(依据安装标记判断;无标记时回退为还原 kitty 绑定)。旧版本(带 `~/fast-path/...` 路径)的绑定同样会被还原
